@@ -1,0 +1,5 @@
+# Copyright (C) 2018 Betalo AB - All Rights Reserved
+
+/forwardingproxy*
+/cert.pem
+/key.pem
