@@ -18,7 +18,7 @@ import (
 
 func main() {
 	var (
-		flagPEMPath                 = flag.String("pem", "", "Filepath to certificate")
+		flagCertPath                = flag.String("cert", "", "Filepath to certificate")
 		flagKeyPath                 = flag.String("key", "", "Filepath to private key")
 		flagAddr                    = flag.String("addr", "", "Server address")
 		flagAuthUser                = flag.String("user", "", "Server authentication username")
@@ -32,11 +32,20 @@ func main() {
 		flagServerReadHeaderTimeout = flag.Duration("serverreadheadertimeout", 30*time.Second, "Server read header timeout")
 		flagServerWriteTimeout      = flag.Duration("serverwritetimeout", 30*time.Second, "Server write timeout")
 		flagServerIdleTimeout       = flag.Duration("serveridletimeout", 30*time.Second, "Server idle timeout")
+		flagVerbose                 = flag.Bool("verbose", false, "Set log level to DEBUG")
 	)
+
 	flag.Parse()
 
 	c := zap.NewProductionConfig()
 	c.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+
+	if *flagVerbose {
+		c.Level.SetLevel(zapcore.DebugLevel)
+	} else {
+		c.Level.SetLevel(zapcore.ErrorLevel)
+	}
+
 	logger, err := c.Build()
 	if err != nil {
 		log.Fatalln("Error: failed to initiate logger")
@@ -45,14 +54,15 @@ func main() {
 	stdLogger := zap.NewStdLog(logger)
 
 	p := &Proxy{
-		Logger:             logger,
-		AuthUser:           *flagAuthUser,
-		AuthPass:           *flagAuthPass,
-		DestDialTimeout:    *flagDestDialTimeout,
-		DestReadTimeout:    *flagDestReadTimeout,
-		DestWriteTimeout:   *flagDestWriteTimeout,
-		ClientReadTimeout:  *flagClientReadTimeout,
-		ClientWriteTimeout: *flagClientWriteTimeout,
+		ForwardingHTTPProxy: NewForwardingHTTPProxy(stdLogger),
+		Logger:              logger,
+		AuthUser:            *flagAuthUser,
+		AuthPass:            *flagAuthPass,
+		DestDialTimeout:     *flagDestDialTimeout,
+		DestReadTimeout:     *flagDestReadTimeout,
+		DestWriteTimeout:    *flagDestWriteTimeout,
+		ClientReadTimeout:   *flagClientReadTimeout,
+		ClientWriteTimeout:  *flagClientWriteTimeout,
 	}
 
 	s := &http.Server{
@@ -82,8 +92,8 @@ func main() {
 	p.Logger.Info("Server starting", zap.String("address", s.Addr))
 
 	var svrErr error
-	if *flagPEMPath != "" && *flagKeyPath != "" {
-		svrErr = s.ListenAndServeTLS(*flagPEMPath, *flagKeyPath)
+	if *flagCertPath != "" && *flagKeyPath != "" {
+		svrErr = s.ListenAndServeTLS(*flagCertPath, *flagKeyPath)
 	} else {
 		svrErr = s.ListenAndServe()
 	}
