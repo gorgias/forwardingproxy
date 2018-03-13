@@ -36,9 +36,9 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p.Logger.Info("Incoming request", zap.String("host", r.Host))
 
 	if p.AuthUser != "" && p.AuthPass != "" {
-		user, pass, ok := parseBasicProxyAuth(r.Header.Get("Proxy-Authenticate"))
+		user, pass, ok := parseBasicProxyAuth(r.Header.Get("Proxy-Authorization"))
 		if !ok || user != p.AuthUser || pass != p.AuthPass {
-			p.Logger.Warn("Authentication attempt with invalid credentials")
+			p.Logger.Warn("Authorization attempt with invalid credentials")
 			http.Error(w, http.StatusText(http.StatusProxyAuthRequired), http.StatusProxyAuthRequired)
 			return
 		}
