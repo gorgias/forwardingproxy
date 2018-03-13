@@ -54,15 +54,15 @@ func main() {
 	stdLogger := zap.NewStdLog(logger)
 
 	p := &Proxy{
-		ReverseProxy:       NewForwardingReverseProxy(stdLogger),
-		Logger:             logger,
-		AuthUser:           *flagAuthUser,
-		AuthPass:           *flagAuthPass,
-		DestDialTimeout:    *flagDestDialTimeout,
-		DestReadTimeout:    *flagDestReadTimeout,
-		DestWriteTimeout:   *flagDestWriteTimeout,
-		ClientReadTimeout:  *flagClientReadTimeout,
-		ClientWriteTimeout: *flagClientWriteTimeout,
+		ForwardingHTTPProxy: NewForwardingHTTPProxy(stdLogger),
+		Logger:              logger,
+		AuthUser:            *flagAuthUser,
+		AuthPass:            *flagAuthPass,
+		DestDialTimeout:     *flagDestDialTimeout,
+		DestReadTimeout:     *flagDestReadTimeout,
+		DestWriteTimeout:    *flagDestWriteTimeout,
+		ClientReadTimeout:   *flagClientReadTimeout,
+		ClientWriteTimeout:  *flagClientWriteTimeout,
 	}
 
 	s := &http.Server{

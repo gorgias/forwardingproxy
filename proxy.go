@@ -21,15 +21,15 @@ import (
 
 // Proxy is a HTTPS forward proxy.
 type Proxy struct {
-	Logger             *zap.Logger
-	AuthUser           string
-	AuthPass           string
-	ReverseProxy       *httputil.ReverseProxy
-	DestDialTimeout    time.Duration
-	DestReadTimeout    time.Duration
-	DestWriteTimeout   time.Duration
-	ClientReadTimeout  time.Duration
-	ClientWriteTimeout time.Duration
+	Logger              *zap.Logger
+	AuthUser            string
+	AuthPass            string
+	ForwardingHTTPProxy *httputil.ReverseProxy
+	DestDialTimeout     time.Duration
+	DestReadTimeout     time.Duration
+	DestWriteTimeout    time.Duration
+	ClientReadTimeout   time.Duration
+	ClientWriteTimeout  time.Duration
 }
 
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +53,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (p *Proxy) handleHTTP(w http.ResponseWriter, r *http.Request) {
 	p.Logger.Debug("Got HTTP request", zap.String("host", r.Host))
-	p.ReverseProxy.ServeHTTP(w, r)
+	p.ForwardingHTTPProxy.ServeHTTP(w, r)
 }
 
 func (p *Proxy) handleTunneling(w http.ResponseWriter, r *http.Request) {
@@ -128,10 +128,12 @@ func parseBasicProxyAuth(auth string) (username, password string, ok bool) {
 	return cs[:s], cs[s+1:], true
 }
 
-// NewForwardingReverseProxy retuns a new reverse proxy that takes an incoming request and
-// sends it to another server, proxying the response back to the client.
+// NewForwardingHTTPProxy retuns a new reverse proxy that takes an incoming
+// request and sends it to another server, proxying the response back to the
+// client.
+//
 // See: https://golang.org/pkg/net/http/httputil/#ReverseProxy
-func NewForwardingReverseProxy(logger *log.Logger) *httputil.ReverseProxy {
+func NewForwardingHTTPProxy(logger *log.Logger) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
 		if _, ok := req.Header["User-Agent"]; !ok {
 			// explicitly disable User-Agent so it's not set to default value
