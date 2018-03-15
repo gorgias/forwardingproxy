@@ -17,3 +17,8 @@ build: ## build application binaries
 .PHONY: image
 image: ## build docker image
 	docker build -t betalo/forwardingproxy .
+
+
+.PHONY: test
+test: ## run unit tests
+	go test ./...
