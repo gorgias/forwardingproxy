@@ -44,7 +44,7 @@ Usage of forwardingproxy:
 To start the proxy as HTTP server, just run:
 
 ```
-$ forwardingproxy -cert cert.pem -key key.pem
+$ forwardingproxy
 ```
 
 To start the proxy as HTTPS server, just provide server certificate and private
