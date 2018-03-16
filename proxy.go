@@ -109,14 +109,14 @@ func transfer(dest io.WriteCloser, src io.ReadCloser) {
 	_, _ = io.Copy(dest, src)
 }
 
-// parseBasicProxyAuth parses an HTTP Basic Authentication string.
+// parseBasicProxyAuth parses an HTTP Basic Authorization string.
 // "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==" returns ("Aladdin", "open sesame", true).
-func parseBasicProxyAuth(auth string) (username, password string, ok bool) {
+func parseBasicProxyAuth(authz string) (username, password string, ok bool) {
 	const prefix = "Basic "
-	if !strings.HasPrefix(auth, prefix) {
+	if !strings.HasPrefix(authz, prefix) {
 		return
 	}
-	c, err := base64.StdEncoding.DecodeString(auth[len(prefix):])
+	c, err := base64.StdEncoding.DecodeString(authz[len(prefix):])
 	if err != nil {
 		return
 	}
