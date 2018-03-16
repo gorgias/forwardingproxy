@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/betalo-sweden/forwardingproxy.svg?branch=master)](https://travis-ci.org/betalo-sweden/forwardingproxy)
+
 # Forwarding HTTP/S Proxy
 
 A forwarding HTTP/S proxy. This server is useful when one wants to have
