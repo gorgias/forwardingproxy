@@ -1,10 +1,16 @@
 # Copyright (C) 2018 Betalo AB - All Rights Reserved
 
-[[constraint]]
-  name = "go.uber.org/zap"
-  revision = "f85c78b1dd998214c5f2138155b320a4a43fbe36"
-
 [prune]
   non-go = true
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+  name = "go.uber.org/zap"
+  revision = "f85c78b1dd998214c5f2138155b320a4a43fbe36"
+
+# Test
+
+[[constraint]]
+  name = "github.com/stretchr/testify"
+  revision = "2aa2c176b9dab406a6970f6a55f513e8a8c8b18f"
