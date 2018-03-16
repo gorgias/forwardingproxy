@@ -18,7 +18,10 @@ build: ## build application binaries
 image: ## build docker image
 	docker build -t betalo/forwardingproxy .
 
+.PHONY: lint
+lint: ## check code for lint errors
+	go vet ./...
 
 .PHONY: test
 test: ## run unit tests
-	go test ./...
+	go test -race ./...
