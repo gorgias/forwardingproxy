@@ -14,15 +14,18 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
 	var (
-		flagCertPath                = flag.String("cert", "", "Filepath to certificate")
-		flagKeyPath                 = flag.String("key", "", "Filepath to private key")
-		flagAddr                    = flag.String("addr", "", "Server address")
-		flagAuthUser                = flag.String("user", "", "Server authentication username")
-		flagAuthPass                = flag.String("pass", "", "Server authentication password")
+		flagCertPath = flag.String("cert", "", "Filepath to certificate")
+		flagKeyPath  = flag.String("key", "", "Filepath to private key")
+		flagAddr     = flag.String("addr", "", "Server address")
+		flagAuthUser = flag.String("user", "", "Server authentication username")
+		flagAuthPass = flag.String("pass", "", "Server authentication password")
+		flagVerbose  = flag.Bool("verbose", false, "Set log level to DEBUG")
+
 		flagDestDialTimeout         = flag.Duration("destdialtimeout", 10*time.Second, "Destination dial timeout")
 		flagDestReadTimeout         = flag.Duration("destreadtimeout", 5*time.Second, "Destination read timeout")
 		flagDestWriteTimeout        = flag.Duration("destwritetimeout", 5*time.Second, "Destination write timeout")
@@ -32,7 +35,10 @@ func main() {
 		flagServerReadHeaderTimeout = flag.Duration("serverreadheadertimeout", 30*time.Second, "Server read header timeout")
 		flagServerWriteTimeout      = flag.Duration("serverwritetimeout", 30*time.Second, "Server write timeout")
 		flagServerIdleTimeout       = flag.Duration("serveridletimeout", 30*time.Second, "Server idle timeout")
-		flagVerbose                 = flag.Bool("verbose", false, "Set log level to DEBUG")
+
+		flagLetsEncrypt = flag.Bool("letsencrypt", false, "Use letsencrypt for https")
+		flagLEWhitelist = flag.String("lewhitelist", "", "Hostname to whitelist for letsencrypt")
+		flagLECacheDir  = flag.String("lecachedir", "/tmp", "Cache directory for certificates")
 	)
 
 	flag.Parse()
@@ -76,6 +82,24 @@ func main() {
 		TLSNextProto:      map[string]func(*http.Server, *tls.Conn, http.Handler){}, // Disable HTTP/2
 	}
 
+	if *flagLetsEncrypt {
+		if *flagLEWhitelist == "" {
+			p.Logger.Fatal("error: no -lewhitelist flag set")
+		}
+		if *flagLECacheDir == "/tmp" {
+			p.Logger.Info("-lecachedir should be set, using '/tmp' for now...")
+		}
+
+		m := &autocert.Manager{
+			Cache:      autocert.DirCache(*flagLECacheDir),
+			Prompt:     autocert.AcceptTOS,
+			HostPolicy: autocert.HostWhitelist(*flagLEWhitelist),
+		}
+
+		s.Addr = ":https"
+		s.TLSConfig = m.TLSConfig()
+	}
+
 	idleConnsClosed := make(chan struct{})
 	go func() {
 		sigint := make(chan os.Signal, 1)
@@ -92,7 +116,7 @@ func main() {
 	p.Logger.Info("Server starting", zap.String("address", s.Addr))
 
 	var svrErr error
-	if *flagCertPath != "" && *flagKeyPath != "" {
+	if *flagCertPath != "" && *flagKeyPath != "" || *flagLetsEncrypt {
 		svrErr = s.ListenAndServeTLS(*flagCertPath, *flagKeyPath)
 	} else {
 		svrErr = s.ListenAndServe()
