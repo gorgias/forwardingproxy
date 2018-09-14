@@ -27,6 +27,12 @@ Usage of forwardingproxy:
     	Destination write timeout (default 5s)
   -key string
     	Filepath to private key
+  -lecachedir string
+        Cache directory for certificates (default "/tmp")
+  -letsencrypt
+        Use letsencrypt for https
+  -lewhitelist string
+        Hostname to whitelist for letsencrypt
   -pass string
     	Server authentication password
   -serveridletimeout duration
@@ -61,6 +67,12 @@ To create a self-signed certificate and private key for testing, run:
 ```
 $ openssl req -newkey rsa:2048 -nodes -keyout key.pem -new -x509 -sha256 -days 3650 -out cert.pem
 
+```
+
+Or enable letsencrypt
+
+```
+$ forwardingproxy -letsencrypt -lewhitelist proxy.somehostname.tld -lecachedir /home/somewhere/.forwardingproxycache
 ```
 
 The server can be configured to run on a specific interface and port (`-addr`),
