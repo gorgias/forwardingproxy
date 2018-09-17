@@ -7,7 +7,8 @@
 
 [[constraint]]
   name = "go.uber.org/zap"
-  revision = "f85c78b1dd998214c5f2138155b320a4a43fbe36"
+  version = "^v1.8"
+
 [[constraint]]
   name = "golang.org/x/crypto"  # For "golang.org/x/crypto/acme/autocert"
   revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"  # arbitrary choice
@@ -17,4 +18,4 @@
 
 [[constraint]]
   name = "github.com/stretchr/testify"
-  revision = "2aa2c176b9dab406a6970f6a55f513e8a8c8b18f"
+  version = "^v1.2"
