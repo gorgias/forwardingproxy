@@ -14,6 +14,17 @@ build: ## build application binaries
 	GOOS=darwin GOARCH=amd64 go build -o forwardingproxy-darwin-amd64 .
 	GOOS=linux GOARCH=amd64 go build -o forwardingproxy-linux-amd64 .
 
+.PHONY: dep
+dep: ## install latest build of dependency manager and linters
+	go get -u github.com/golang/dep/cmd/dep
+
+	go get -u github.com/alecthomas/gometalinter
+	gometalinter --install
+
+.PHONY: dep-ensure
+dep-ensure: ## ensure dependencies are safely vendored in the project
+	dep ensure
+
 .PHONY: image
 image: ## build docker image
 	docker build -t betalo/forwardingproxy .
