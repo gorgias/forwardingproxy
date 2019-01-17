@@ -54,7 +54,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (p *Proxy) handleHTTP(w http.ResponseWriter, r *http.Request) {
 	p.Logger.Debug("Got HTTP request", zap.String("host", r.Host))
-	if strings.Contains(r.Host, p.Avoid) == true {
+	if p.Avoid != "" && strings.Contains(r.Host, p.Avoid) == true {
 		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusMethodNotAllowed)
 		return
 	}
@@ -63,7 +63,7 @@ func (p *Proxy) handleHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (p *Proxy) handleTunneling(w http.ResponseWriter, r *http.Request) {
 
-	if strings.Contains(r.Host, p.Avoid) == true {
+	if p.Avoid != "" && strings.Contains(r.Host, p.Avoid) == true {
 		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusMethodNotAllowed)
 		return
 	}
@@ -158,4 +158,3 @@ func NewForwardingHTTPProxy(logger *log.Logger) *httputil.ReverseProxy {
 		Director: director,
 	}
 }
-
