@@ -24,6 +24,7 @@ func main() {
 		flagAddr     = flag.String("addr", "", "Server address")
 		flagAuthUser = flag.String("user", "", "Server authentication username")
 		flagAuthPass = flag.String("pass", "", "Server authentication password")
+		flagAvoid    = flag.String("avoid", "", "Site to be avoided")
 		flagVerbose  = flag.Bool("verbose", false, "Set log level to DEBUG")
 
 		flagDestDialTimeout         = flag.Duration("destdialtimeout", 10*time.Second, "Destination dial timeout")
@@ -69,6 +70,7 @@ func main() {
 		DestWriteTimeout:    *flagDestWriteTimeout,
 		ClientReadTimeout:   *flagClientReadTimeout,
 		ClientWriteTimeout:  *flagClientWriteTimeout,
+		Avoid:               *flagAvoid,
 	}
 
 	s := &http.Server{
@@ -129,3 +131,4 @@ func main() {
 	<-idleConnsClosed
 	p.Logger.Info("Server stopped")
 }
+
