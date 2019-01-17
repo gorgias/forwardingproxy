@@ -13,6 +13,8 @@ $ forwardingproxy -h
 Usage of forwardingproxy:
   -addr string
     	Server address
+  -avoid string
+    	Site to be avoided
   -cert string
     	Filepath to certificate
   -clientreadtimeout duration
